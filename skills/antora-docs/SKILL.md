@@ -58,13 +58,23 @@ docs/
       pages/
         index.adoc
         getting-started.adoc
-        configuration.adoc
         operations.adoc
-        reference.adoc
+      examples/
+      partials/
+      images/
+    reference/
+      nav.adoc
+      pages/
+        configuration.adoc
+        api-reference.adoc
+        events.adoc
+        iam-actions.adoc
       examples/
       partials/
       images/
 ```
+
+Put reference pages in their own Antora module, such as `modules/reference`, not in the `ROOT` module. Keep overview, getting started, feature, architecture, operations, troubleshooting, and ADR pages in `ROOT` unless the project already uses a more specific module structure.
 
 Use page structure like this for substantial pages:
 
@@ -99,6 +109,79 @@ Procedure text.
 ```
 
 For short reference pages, omit `Synopsis` when title plus opening paragraph is enough.
+
+## Documentation Information Architecture
+
+Assume this top-level documentation structure unless the project already uses a clear alternative:
+
+```text
+Overview
+Getting Started
+Features
+Architecture
+Operations
+Reference
+Troubleshooting
+Architecture Decision Records
+```
+
+Use each section for a distinct reader need:
+
+- `Overview`: project purpose, scope, main components, supported environments, and next links.
+- `Getting Started`: shortest path from prerequisites to a verified working result.
+- `Features`: user-facing capabilities, domain manuals, and usage guides.
+- `Architecture`: system design, component relationships, data flow, and important tradeoffs.
+- `Operations`: deployment, FluxCD deployment, startup, shutdown, upgrades, backups, metrics, logs, and runtime procedures.
+- `Reference`: lookup material that should be complete rather than tutorial-oriented.
+- `Troubleshooting`: symptom-driven diagnosis, causes, fixes, and verification.
+- `Architecture Decision Records`: decision history with context, decision, status, and consequences.
+
+ADRs are immutable historical records. Keep old decisions intact, mark stale statements as historical proposals, and add current implementation notes so the page does not describe false current behavior.
+
+Use this ADR page metadata pattern:
+
+```asciidoc
+= {adr-id} - Record architecture decisions
+:page-description: Architecture decisions are documented using Architecture Decision Records (ADRs).
+:keywords: architecture, adr, documentation
+:revdate: 22-11-2022
+:author: Steffen F. Qvistgaard
+:adr-id: {component-id}-ADR-0001
+```
+
+ADR metadata rules:
+
+- Use `{adr-id}` in the page title so the rendered title includes the component-specific ADR identifier.
+- Define `:adr-id:` as `{component-id}-ADR-NNNN`, with a zero-padded sequence such as `0001`.
+- Define `component-id` in `antora.yml` under `asciidoc.attributes`.
+- Use `:revdate:` for the decision or last meaningful documentation date.
+- Use `:author:` for the ADR author.
+- Keep stale ADR content, but add current implementation notes instead of rewriting history.
+
+Always organize feature and reference material under these topics:
+
+```text
+Features
+  Domain Manual
+  Domain Usage Guide
+Reference
+  Configuration
+  API Reference
+  Events
+    Domain Events
+  Well-Known Tags
+  IAM Actions
+```
+
+Omit topics or pages when there is no valuable information for them. For example, do not create a `Well-Known Tags` page when the project does not define tags. Preserve the information architecture as the default shape, but do not add empty or low-value placeholder pages.
+
+Keep domain pages practical:
+
+- Put narrative usage, best practices, and workflows under `Features`.
+- Put exhaustive keys, APIs, events, tags, and IAM action names under `Reference`.
+- Put reference pages in the `reference` Antora module, not under `ROOT`.
+- Use `Architecture` only for design explanation, not feature walkthroughs.
+- Use `Operations` for live-system work, including deployment tools such as FluxCD.
 
 ## AsciiDoc Rules
 
@@ -328,20 +411,131 @@ Use stable structure:
 - Examples.
 - Compatibility notes.
 
+### IAM Actions Reference Page
+
+Use only when the project defines service-specific IAM or authorization actions. Omit this page when there are no IAM actions.
+
+Include:
+
+- Page title: `IAM Actions Reference`.
+- Page description that states the page covers service-specific IAM resources, actions, and condition context keys for permission policies.
+- Keywords such as `iam`, `security`, `authorization`, and `permissions` when relevant.
+- Navigation title: `IAM Actions`.
+- Overview that states the service name and service prefix.
+- Short explanation of how actions are used in permission policies.
+- One section per action group, domain, or service prefix.
+- Service prefix for each group.
+- Table of actions with columns for action name, description, and access level.
+
+Use this table shape:
+
+```asciidoc
+[cols="2,4,1", options="header"]
+|===
+| Action | Description | Access Level
+
+| `service:CreateResource`
+| Create a new resource.
+| Write
+|===
+```
+
+Action entries must:
+
+- Use fully qualified action names such as `catalog:CreateProduct`.
+- Use consistent access levels such as `Read`, `Write`, `List`, `Tagging`, or project-specific values.
+- Describe the exact operation authorized by the action.
+- Mention destructive effects in the description, such as permanent deletion or affected related resources.
+- Match application behavior verified from source code, policy definitions, API handlers, or tests.
+- Avoid inventing actions from CRUD naming conventions unless the implementation defines them.
+
+When the system supports IAM resources or condition context keys, add separate sections for them. Include resource formats, supported actions, condition key names, value types, and when each condition applies.
+
+### Domain Events Reference Pages
+
+Use only when the application emits domain events. Omit event reference pages when the application has no domain events.
+
+Document emitted domain events under the `reference` Antora module with an event index page and one page per event. Group event pages by domain or aggregate.
+
+Use this navigation shape:
+
+```asciidoc
+** xref:reference:events.adoc[Event Reference]
+*** Catalog Events
+**** xref:reference:events/catalog/catalog-created.adoc[]
+**** xref:reference:events/catalog/catalog-updated.adoc[]
+**** xref:reference:events/catalog/catalog-deleted.adoc[]
+*** Product Events
+**** xref:reference:events/product/product-created.adoc[]
+**** xref:reference:events/product/product-deleted.adoc[]
+**** xref:reference:events/product/basic-product-data-changed.adoc[]
+**** xref:reference:events/product/category-added.adoc[]
+**** xref:reference:events/product/category-unassigned.adoc[]
+```
+
+The event index page should include:
+
+- Purpose of domain events in the application.
+- Domains or aggregates that emit events.
+- Event list grouped by domain or aggregate.
+- Links to event specification pages.
+- Notes about delivery semantics, ordering, versioning, and compatibility when the implementation defines them.
+
+Each event specification page should include:
+
+- Page title using the event object name, such as `` `ProductCreated` Object Specification``.
+- `:navtitle:` matching the event name.
+- Short description of when the event is emitted.
+- Payload diagram or schema when useful, such as a PlantUML JSON diagram.
+- Attribute table for top-level fields.
+- Attribute tables for nested objects.
+- Example JSON representation.
+- Compatibility or version notes when event payloads are versioned.
+
+Use this attribute table shape:
+
+```asciidoc
+[cols="2,1,5,2", options="header"]
+|===
+| Field | Data Type | Description | Default Value
+
+| `name`
+| String
+| The full name of the product.
+| `null`
+|===
+```
+
+Event documentation must:
+
+- Match events emitted by the application, verified from source code, event definitions, message schemas, tests, or configuration.
+- Describe payload fields exactly as serialized.
+- Include examples that match actual field names and JSON shape.
+- Document whether fields are optional, nullable, defaulted, or always present.
+- Document nested objects in their own subsections.
+- Avoid inventing events from domain concepts unless the implementation emits them.
+- Avoid saying an event is emitted for an operation unless verified from implementation.
+
 ## nav.adoc Pattern
 
-Use clear hierarchy and short titles:
+Derive `nav.adoc` from `Documentation Information Architecture`. Keep labels short and preserve that order unless the existing project structure requires otherwise.
+
+Use this pattern for mechanics:
 
 ```asciidoc
 * xref:index.adoc[]
 * xref:getting-started.adoc[]
-* xref:configuration.adoc[]
+* Features
+** xref:features/domain-manual.adoc[]
+** xref:features/domain-usage-guide.adoc[]
+* xref:architecture.adoc[]
 * Operations
 ** xref:operations.adoc[]
-** xref:troubleshooting.adoc[]
 * Reference
-** xref:api-reference.adoc[]
-** xref:cli-reference.adoc[]
+** xref:reference:configuration.adoc[]
+** xref:reference:events.adoc[]
+* xref:troubleshooting.adoc[]
+* xref:adr/index.adoc[Architecture Decision Records]
 ```
 
 ## antora.yml Pattern
@@ -355,6 +549,10 @@ version: '1.0'
 start_page: ROOT:index.adoc
 nav:
   - modules/ROOT/nav.adoc
+  - modules/reference/nav.adoc
+asciidoc:
+  attributes:
+    component-id: WH
 ```
 
 ## Rewrite Checklist
@@ -395,24 +593,3 @@ When asked to write docs:
 - Keep changes small and coherent.
 - If source behavior is unclear, inspect code before writing claims.
 - If behavior still cannot be confirmed, write conditional wording or ask one focused question.
-
-
-Overview
-Getting Started
-Features
-  Domain 1 Manual & usage guide best practice
-  Domain 2 Manual & usage guide
-Architecture
-Operations
-   FluxCD Deployment
-Reference
-   Configuration
-   API Reference
-   Events
-      Domain
-        Domain event 1
-        Domain event 2
-   Well-Known Tags
-   IAM Actions
-Troubleshooting
-Architecture Decision Records
