@@ -1,1 +1,0 @@
-/nix/store/jrnn6hd0k91c1xp9lm6d5kkkx94flw6m-home-manager-files/.config/opencode/commands/enable-lsp.md

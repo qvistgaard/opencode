@@ -1,1 +1,83 @@
-/nix/store/jrnn6hd0k91c1xp9lm6d5kkkx94flw6m-home-manager-files/.config/opencode/opencode.json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": ["AGENTS.md"],
+  "lsp": {
+    "css": {
+      "command": ["vscode-css-language-server", "--stdio"],
+      "extensions": [".css", ".scss", ".less"]
+    },
+    "html": {
+      "command": ["vscode-html-language-server", "--stdio"],
+      "extensions": [".html", ".htm"]
+    },
+    "json": {
+      "command": ["vscode-json-language-server", "--stdio"],
+      "extensions": [".json", ".jsonc"]
+    },
+    "templ": {
+      "command": ["templ", "lsp"],
+      "extensions": [".templ"]
+    },
+    "jsonnet": {
+      "command": ["jsonnet-language-server"],
+      "extensions": [".jsonnet", ".libsonnet"]
+    },
+    "java": {
+      "command": [
+        "bash",
+        "-lc",
+        "lombok=\"${LOMBOK_JAR:-$(ls \"$HOME\"/.m2/repository/org/projectlombok/lombok/*/lombok-*.jar 2>/dev/null | sort -V | tail -n 1)}\"; if [ -n \"$lombok\" ]; then exec jdtls --jvm-arg=\"-javaagent:$lombok\"; fi; exec jdtls"
+      ],
+      "extensions": [".java"]
+    }
+  },
+  "mcp": {
+    "azure devops": {
+      "type": "local",
+      "command": [
+        "/home/wayland/Projects/Source2Sea/az-mcp/.venv/bin/python",
+        "/home/wayland/Projects/Source2Sea/az-mcp/azure_devops_work_item_mcp.py"
+      ]
+    }
+  },
+  "permission": {
+    "*": "ask",
+    "bash": {
+      "*": "ask",
+      "find *": "allow",
+      "glob *": "allow",
+      "gofmt *": "allow",
+      "go test *": "allow",
+      "grep *": "allow",
+      "ls *": "allow",
+      "rg *": "allow",
+      "sort *": "allow",
+      "/etc/profiles/per-user/wayland/bin/but *": "allow",
+      "but *": "allow",
+      "templ generate *": "allow"
+    },
+    "glob": "allow",
+    "grep": "allow",
+    "list": "allow",
+    "lsp": "allow",
+    "read": "allow",
+    "skill": "allow",
+    "task": {
+      "*": "ask",
+      "explore": "allow"
+    },
+    "todowrite": "allow",
+    "edit": "deny"
+  },
+  "plugin": [
+    "opencode-claude-auth@latest", 
+    "opencode-caveman",
+    "open-plan-annotator@1.9.2",
+    "kdco-notify"
+  ],
+  "tools": {
+    "patch": true,
+    "write": true,
+    "edit": true
+  }
+}
