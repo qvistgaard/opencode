@@ -53,6 +53,8 @@
       "git diff *": "allow",
       "git log": "allow",
       "git log *": "allow",
+      "git branch --show-current": "allow",
+      "git rev-parse *": "allow",
       "git status": "allow",
       "git status *": "allow",
       "ls *": "allow",
