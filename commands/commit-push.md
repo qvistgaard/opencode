@@ -62,6 +62,9 @@ Before `git commit`:
 - Inspect the staged diff with `git diff --staged`.
 - Confirm the staged diff contains only approved changes.
 - If the staged diff contains unknown or unrelated changes, stop and ask.
+- Print the full proposed commit message, including subject and body.
+- Ask the user to approve the commit message or provide additional information to include.
+- Do not run `git commit` until the user approves the final commit message.
 
 After committing:
 
