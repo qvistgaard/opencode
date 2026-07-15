@@ -162,8 +162,9 @@ Always organize feature and reference material under these topics:
 
 ```text
 Features
-  Domain Manual
-  Domain Usage Guide
+  <Feature Name>      (one page per domain concept, e.g. Users, Groups, Roles)
+  <Feature Name>
+  ...
 Reference
   Configuration
   API Reference
@@ -172,6 +173,8 @@ Reference
   Well-Known Tags
   IAM Actions
 ```
+
+Each domain concept gets its own dedicated page under `Features`. Do not use generic `Domain Manual` or `Domain Usage Guide` titles. Name each page after the concept it describes, such as `Users`, `Groups`, or `Roles`.
 
 Omit topics or pages when there is no valuable information for them. For example, do not create a `Well-Known Tags` page when the project does not define tags. Preserve the information architecture as the default shape, but do not add empty or low-value placeholder pages.
 
@@ -366,19 +369,123 @@ Use this order:
 6. Verify result.
 7. Link to next topics.
 
-### Configuration Page
+### Feature Page
 
-Use description lists or tables:
+Use one page per domain concept under `Features`. Name the page after the concept: `users.adoc`, `groups.adoc`, `roles.adoc`.
+
+Structure each feature page in this order:
+
+1. **Overview** — what the concept is, its purpose, and how it fits into the broader system.
+2. **Concepts** — key terms, types, states, or relationships the reader must understand before using the feature.
+3. **How It Works** — behavioral description: lifecycle, rules, constraints, side effects, and interactions with other features.
+4. **Usage** — step-by-step procedures for the most common tasks. Use ordered lists. One procedure per heading.
+5. **Permissions** — IAM actions required for each operation. Link to the IAM Actions reference page.
+6. **Related** — cross-links to related feature pages, API reference, and event reference.
+
+Use this page template:
 
 ```asciidoc
-`server.port`::
-TCP port used by the HTTP server. Default: `8080`.
+= Users
+:page-description: How users are managed in the platform.
+:keywords: users, identity, iam
 
-`server.host`::
-Address to bind. Default: `127.0.0.1`.
+[[users-overview]]
+== Overview
+
+Describe what a user is and its role in the system.
+
+[[users-concepts]]
+== Concepts
+
+Define terms. Use a description list or short paragraphs.
+
+[[users-how-it-works]]
+== How It Works
+
+Explain lifecycle, states, rules, and interactions.
+
+[[users-usage]]
+== Usage
+
+[[users-usage-create]]
+=== Create a User
+
+. Step one.
+. Step two.
+. Verify result.
+
+[[users-usage-delete]]
+=== Delete a User
+
+. Step one.
+. Step two.
+
+[[users-permissions]]
+== Permissions
+
+List IAM actions required per operation. Link to xref:reference:iam-actions.adoc[].
+
+[[users-related]]
+== Related
+
+* xref:groups.adoc[]
+* xref:reference:api-reference.adoc[]
+* xref:reference:events.adoc[]
 ```
 
-For each option, document:
+Rules:
+
+- Do not merge multiple domain concepts into one feature page.
+- Do not use `Domain Manual` or `Domain Usage Guide` as page or section titles.
+- Include only sections that have real content. Omit empty sections.
+- Keep overview short: two to four sentences.
+- Keep concept definitions precise. Avoid marketing language.
+- Procedures must be numbered steps. Each step states one action and its expected result.
+- Link permissions to the IAM Actions reference rather than repeating action names inline.
+
+### Configuration Page
+
+Use a three-column table grouped by functional area. Add an explicit anchor before each group heading.
+
+```asciidoc
+[[configuration-server-management]]
+== Server and Management
+
+[cols="3,5,2", options="header"]
+|===
+| Property | Description | Default
+
+| `server.port`
+| HTTP port.
+| `8183`
+
+| `management.server.port`
+| Management port.
+| `8181`
+
+| `management.endpoints.web.exposure.include`
+| Exposed actuator endpoints.
+| `*`
+
+| `management.endpoint.health.show-details`
+| Health detail visibility.
+| `always`
+
+| `management.tracing.sampling.probability`
+| Trace sampling probability.
+| `1`
+
+| `management.opentelemetry.tracing.export.otlp.endpoint`
+| OTLP trace export endpoint.
+| `http://localhost:4318/v1/traces`
+
+| `management.otlp.metrics.export.enabled`
+| OTLP metrics export switch.
+| `false`
+|===
+```
+
+For each property, document:
 
 - Name.
 - Type.
@@ -483,14 +590,71 @@ The event index page should include:
 
 Each event specification page should include:
 
-- Page title using the event object name, such as `` `ProductCreated` Object Specification``.
+- Page title using event object name, such as `` `ProductCreated` Object Specification``.
 - `:navtitle:` matching the event name.
 - Short description of when the event is emitted.
-- Payload diagram or schema when useful, such as a PlantUML JSON diagram.
+- PlantUML JSON payload diagram using `[plantuml, <EventName>-diagram-json, png]`; include it for every event.
 - Attribute table for top-level fields.
 - Attribute tables for nested objects.
 - Example JSON representation.
 - Compatibility or version notes when event payloads are versioned.
+
+Use this complete event page template. Replace names, descriptions, types, fields, payload values, and anchors with values verified from implementation:
+
+```asciidoc
+= CatalogDeleted Event
+:page-description: Event emitted when a catalog is deleted from Warehouse.
+:keywords: events, catalog
+:navtitle: CatalogDeleted
+
+[[catalog-deleted-overview]]
+== Overview
+
+The `CatalogDeleted` event is emitted when a catalog is deleted from the Warehouse system.
+
+Event name::
+`catalogDeleted`
+
+Aggregate::
+Catalog
+
+[[catalog-deleted-diagram]]
+== Payload Diagram
+
+[plantuml, CatalogDeleted-diagram-json, png]
+----
+@startjson
+!theme sandstone
+{
+  "CatalogDeleted": {
+    "catalog": "The Source2Sea Resource Name (SRN) identifying the deleted catalog"
+  }
+}
+@endjson
+----
+
+[[catalog-deleted-attributes]]
+== Attributes
+
+[cols="2,1,5", options="header"]
+|===
+| Field | Data Type | Description
+
+| `catalog`
+| CatalogSrn
+| The Source2Sea Resource Name (SRN) identifying the deleted catalog.
+|===
+
+[[catalog-deleted-example]]
+== Example
+
+[source,json]
+----
+{
+  "catalog": "srn:catalog:account:12345:catalog:67890"
+}
+----
+```
 
 Use this attribute table shape:
 
@@ -510,6 +674,9 @@ Event documentation must:
 
 - Match events emitted by the application, verified from source code, event definitions, message schemas, tests, or configuration.
 - Describe payload fields exactly as serialized.
+- Include PlantUML JSON diagram for every event. Diagram root key must exactly match event object name.
+- Keep diagram, attribute tables, and JSON example same payload structure and exact serialized field names.
+- Use meaningful field-description strings in diagrams, not sample values, unless field needs a concrete format example.
 - Include examples that match actual field names and JSON shape.
 - Document whether fields are optional, nullable, defaulted, or always present.
 - Document nested objects in their own subsections.

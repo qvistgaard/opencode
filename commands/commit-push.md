@@ -5,22 +5,24 @@ agent: build
 
 Commit and push only file changes made in this session.
 
+When user input or a decision is required, use the `question` tool. Do not ask questions in plain text. Use clear options; include a custom response only when needed for a commit-message revision or extra commit-body context.
+
 Before committing:
 
 - Inspect `git status --short`, `git diff`, `git diff --staged`, and `git log --oneline -10`.
 - Identify which changed files were edited or created during this opencode session.
 - Treat every other changed, deleted, staged, or untracked file as unknown.
-- If unknown files exist, ask the user whether each unknown file should be included, excluded, or whether the command should stop.
+- If unknown files exist, use the `question` tool to ask whether each unknown file should be included, excluded, or whether the command should stop.
 - Do not include unknown files without explicit confirmation.
 - Do not revert, discard, or modify unknown files.
-- If staged changes already exist, verify whether they belong to this session. Ask before committing them when ownership is unclear.
+- If staged changes already exist, verify whether they belong to this session. Use the `question` tool before committing them when ownership is unclear.
 - If no session changes are available after exclusions, stop without committing.
 
 Staging rules:
 
 - Stage only approved files.
 - Prefer path-specific `git add -- <path>` commands.
-- For files that contain mixed session and non-session edits, stop and ask how to proceed instead of staging the whole file.
+- For files that contain mixed session and non-session edits, stop and use the `question` tool to ask how to proceed instead of staging the whole file.
 
 Commit message requirements:
 
@@ -61,10 +63,10 @@ Before `git commit`:
 
 - Inspect the staged diff with `git diff --staged`.
 - Confirm the staged diff contains only approved changes.
-- If the staged diff contains unknown or unrelated changes, stop and ask.
+- If the staged diff contains unknown or unrelated changes, stop and use the `question` tool.
 - Print the full proposed commit message, including subject and body.
-- Ask the user to approve the commit message or provide additional information to include.
-- Do not run `git commit` until the user approves the final commit message.
+- Use the `question` tool for final commit approval. Present the complete commit message in the question and offer `Approve commit`, `Revise message`, and `Cancel` options.
+- Do not run `git commit` unless the user selects `Approve commit` in that form. Do not treat free-text replies as approval.
 
 After committing:
 
