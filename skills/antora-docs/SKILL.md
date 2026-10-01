@@ -518,6 +518,33 @@ Use stable structure:
 - Examples.
 - Compatibility notes.
 
+### API Reference Pages
+
+For API documentation, keep endpoint reference pages and API index pages consistent:
+
+- When documenting endpoint reference pages, also use the `api-docs` skill for request/response order, parameter cards, media type documentation, raw HTTP examples, response code cards, and response format switchers.
+- When documenting Spring REST API migrations, also follow `spring-rest-api` skill rules for route versioning, contract/controller separation, media types, OpenAPI metadata, authorization, compatibility, and migration testing.
+- Document replacement endpoints on deprecated endpoint pages near top of page.
+- Mark deprecated endpoint groups visibly in `api-reference.adoc`, not only on individual endpoint pages.
+- Add a `Status` column when an endpoint table mixes current, deprecated, and compatibility endpoints.
+- Use `Deprecated` for endpoints that should not be used by new integrations.
+- Use `Compatibility` for endpoints that remain supported but are not part of current API design.
+- Rename nav groups when needed so deprecated endpoints are visible in navigation, for example `Deprecated Legacy APIs`.
+- Link API pages to feature or behavior pages that explain domain rules affecting responses, counts, eligibility, filtering, or visibility.
+- Prefer stable anchor links to the exact rule section, for example `xref:ROOT:product-projections.adoc#product-projections-category-requirements[...]`.
+- Add related links from both directions when useful: API page to behavior page, behavior page to API reference.
+- Keep content negotiation explicit. Document `Accept` values, response body shape, and migration use case. Prefer API reference cards and response format switchers over tables when the endpoint page uses that style.
+- When replacing query parameters during migration, document old and new names together and state fallback/precedence rules.
+- Keep compatibility notes factual. Do not call an intentional design change a parity gap.
+
+Admonition rules for API pages:
+
+- Do not put unrelated advisories in the same admonition block.
+- Use multiple adjacent admonition blocks when topics differ, such as deprecation, response media type, and domain eligibility.
+- Use `[IMPORTANT]` for deprecation or required migration warnings.
+- Use `[NOTE]` for contextual links, replacement details, and non-blocking behavior notes.
+- Keep each admonition focused on one topic.
+
 ### IAM Actions Reference Page
 
 Use only when the project defines service-specific IAM or authorization actions. Omit this page when there are no IAM actions.

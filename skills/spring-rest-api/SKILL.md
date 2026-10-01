@@ -162,6 +162,11 @@ Public endpoint method does one thing: run query; run command for events; or run
 - Event/model mutation variants implemented when applicable.
 - Model response after mutation reloaded from query.
 - Tests cover route, auth, validation, status, representation, and migration compatibility.
+- API documentation updated with Antora rules when the project uses Antora docs.
+- Deprecated or compatibility endpoints visibly marked in endpoint indexes and navigation, not only in OpenAPI annotations.
+- Content negotiation documented when multiple `Accept` media types produce different response shapes.
+- Migration notes document renamed query parameters, fallback aliases, and precedence rules.
+- Domain behavior affecting responses, counts, eligibility, filtering, or visibility linked from API docs to feature/behavior docs.
 
 ## Migration Workflow
 
@@ -172,6 +177,21 @@ Public endpoint method does one thing: run query; run command for events; or run
 5. Migrate read endpoints to direct queries. Migrate writes to event/model variants and query-after-command model responses.
 6. Keep legacy routes only when documented compatibility window requires them. Mark deprecated in OpenAPI, test both surfaces, and remove after migration deadline.
 7. Test old and new behavior, then update API documentation and clients.
+8. Do not describe intentional design changes as parity gaps. Track only required client-impacting differences as gaps.
+
+## API Documentation Handoff
+
+When implementing or migrating Spring APIs in a project with Antora docs:
+
+- Use the `api-docs` skill for endpoint reference page structure, parameter cards, media type documentation, raw HTTP examples, response code cards, and response format switchers.
+- Update endpoint page, API index, nav, examples, and IAM reference if affected.
+- Put deprecation or replacement information near top of deprecated endpoint pages.
+- Keep unrelated documentation advisories in separate admonition blocks.
+- Use `[IMPORTANT]` for deprecation or required migration warnings.
+- Use `[NOTE]` for contextual links, replacement details, and non-blocking behavior notes.
+- Link API docs to behavior pages for domain rules that affect inclusion, visibility, counts, filtering, or eligibility.
+- Use stable Antora anchors for rule links.
+- Keep docs and OpenAPI consistent for parameter names, media types, status codes, and response shapes.
 
 ## Review Rules
 
@@ -188,3 +208,6 @@ Flag:
 - repeated command mapping or response conversion
 - missing event/model mutation representation without product reason
 - breaking migration without compatibility plan
+- missing API documentation updates for changed public route, media type, parameter, status, response shape, deprecation, or domain rule link
+- deprecated endpoints hidden in docs index/nav or marked only on detail pages
+- mixed-topic admonition blocks that combine deprecation, migration, response format, and domain behavior notes

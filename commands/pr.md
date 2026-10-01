@@ -1,5 +1,5 @@
 ---
-description: Push the current Git branch and create an Azure DevOps pull request with auto-complete.
+description: Push the current Git branch and create an Azure DevOps pull request.
 agent: build
 ---
 
@@ -23,6 +23,18 @@ PR requirements:
 - Prefer squash merge unless the repository policy requires another merge strategy.
 - Transition work items only when work items are linked or specified.
 
+Argument behavior:
+
+- Parse `$ARGUMENTS` for target branch, work items, reviewers, labels, draft state, and behavior overrides.
+- Default behavior: `auto_complete: true`, `delete_source_branch: true`, and `squash: true`.
+- If `$ARGUMENTS` includes `keep branch`, `keep source branch`, `do not delete branch`, or `no delete branch`, set `delete_source_branch: false`.
+- If `$ARGUMENTS` includes `delete branch` or `delete source branch`, set `delete_source_branch: true`.
+- If `$ARGUMENTS` includes `auto merge`, `auto-merge`, `auto complete`, or `auto-complete`, set `auto_complete: true`.
+- If `$ARGUMENTS` includes `do not auto-merge`, `no auto-merge`, `do not auto complete`, or `no auto-complete`, set `auto_complete: false`.
+- If `$ARGUMENTS` includes `draft`, set `draft: true` and `auto_complete: false` unless auto-complete is explicitly requested too.
+- If `$ARGUMENTS` includes `no squash`, set `squash: false`.
+- If `$ARGUMENTS` includes `squash`, set `squash: true`.
+
 Title:
 
 - Follow Conventional Commits: `type(scope): summary` or `type: summary`.
@@ -44,6 +56,6 @@ Description must include:
 - Risks or rollout notes when relevant.
 - Linked work items when present or supplied in `$ARGUMENTS`.
 
-Use the Azure DevOps pull request tool with `auto_complete: true`, `delete_source_branch: true`, and `squash: true` unless explicitly told otherwise.
+Use the Azure DevOps pull request tool with behavior values resolved from `$ARGUMENTS`.
 
 After creating the PR, return the PR URL and a concise summary.
