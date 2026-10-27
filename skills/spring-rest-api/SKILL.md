@@ -121,6 +121,36 @@ For Source2Sea mutations, expose event and model variants on same route where pr
 
 Never construct post-mutation model from request DTO. Query after command.
 
+### Event Stream GET Endpoints
+
+For Source2Sea GET endpoints on individual resources, expose both model and event stream representations where audit trails or event replay are useful:
+
+- Model: `APPLICATION_VND_SOURCE2SEA_JSON_VALUE`; returns current resource state from projection query.
+- Events: `APPLICATION_VND_SOURCE2SEA_EVENT_JSON_VALUE`; returns full event history for the aggregate.
+
+Create a `Get{Resource}History` query that retrieves the aggregate instance and returns its event stream via `ReactiveAggregate::events`. Use `switchIfEmpty(Mono.error(...))` to return 404 when aggregate does not exist.
+
+Example pattern:
+
+```java
+@GetMapping(value = "/{resourceId}", produces = APPLICATION_VND_SOURCE2SEA_JSON_VALUE)
+Mono<ResourceResponse> get(@IamResource ResourceSrn resource, @PathVariable String resourceId);
+
+@GetMapping(value = "/{resourceId}", produces = APPLICATION_VND_SOURCE2SEA_EVENT_JSON_VALUE)
+Flux<Event> getAsEvents(@IamResource ResourceSrn resource, @PathVariable String resourceId);
+```
+
+Implementation calls history query:
+
+```java
+@Override
+public Flux<Event> getAsEvents(ResourceSrn resource, String resourceId) {
+  return queryFactory.create(GetResourceHistory.class)
+                     .resource(resource)
+                     .execute();
+}
+```
+
 ```java
 @Override
 public Mono<FeatureResponse> createAsModel(AccountSrn account,
