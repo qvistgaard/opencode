@@ -1,5 +1,29 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "providers": {
+    "colibri": {
+      "name": "Colibrì Local",
+      "package": "@opencode/ai/providers/openai-compatible",
+      "settings": {
+        "baseURL": "http://127.0.0.1:8000/v1",
+        "headerTimeout": 600000,
+        "chunkTimeout": false
+      },
+      "models": {
+        "qwen3.6-colibri": {
+          "name": "Qwen3.6 35B (Local)"
+        },
+	"qwen3-coder-30b-a3b-colibri": {
+          "modelID": "qwen3-coder-30b-a3b-colibri",
+          "name": "Qwen3-Coder 30B A3B (Local)",
+          "limit": {
+            "context": 65536,
+            "output": 8192
+          }
+        }
+      }
+    }
+  },
   "instructions": ["AGENTS.md"],
   "lsp": {
     "css": {
@@ -65,6 +89,7 @@
     { "action": "shell", "resource": "templ generate *", "effect": "allow" },
     { "action": "glob", "resource": "*", "effect": "allow" },
     { "action": "grep", "resource": "*", "effect": "allow" },
+    { "action": "azure_devops_create_azure_devops_work_item", "resource": "*", "effect": "allow" },
     { "action": "azure_devops_read_azure_devops_work_item", "resource": "*", "effect": "allow" },
     { "action": "list", "resource": "*", "effect": "allow" },
     { "action": "read", "resource": "*", "effect": "allow" },
