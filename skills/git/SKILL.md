@@ -53,8 +53,19 @@ Act on natural-language git requests directly. The user's request is the instruc
 
 ## Push Rules
 
-- Push the current branch. Use `git push -u origin <branch>` when no upstream exists.
-- Never force-push. Use `git push --force-with-lease` only when the user explicitly asks.
+- Before pushing, check the branch state with `git status --short --branch` and `git rev-parse --abbrev-ref @{upstream}`.
+- Ask with the question tool before every push. Use the options below that match the state.
+- No upstream: `Push and set upstream` (Recommended) runs `git push -u origin <branch>`.
+- Upstream exists and the branch is ahead: `Push to <upstream>` (Recommended).
+- Upstream exists and the branch is behind or diverged: do not push. Offer `Pull --ff-only first`.
+- Always offer `Create new branch and push` as an option. Use it when the user wants the commit on a separate branch.
+  - If the user gives a branch name, use it.
+  - If not, name the branch from the commit: `<type>/<slug>`, where `<type>` is the commit type and `<slug>` is the commit summary in lower-case, with spaces and punctuation replaced by hyphens, limited to 50 characters. Example: `feat(git): add git skill` becomes `feat/add-git-skill`.
+  - If the name already exists, add a numeric suffix such as `-2`.
+  - Create the branch with `git switch -c <name>`, then push it with `git push -u origin <name>`.
+- Always offer `Cancel`.
+- Up to date with nothing to push: report that and stop.
+- Never offer force-push unless the user explicitly asks for it. Use `git push --force-with-lease` only when the user explicitly asks.
 
 ## Pull, Branch, and Stash Rules
 
