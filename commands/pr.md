@@ -35,26 +35,7 @@ Argument behavior:
 - If `$ARGUMENTS` includes `no squash`, set `squash: false`.
 - If `$ARGUMENTS` includes `squash`, set `squash: true`.
 
-Title:
-
-- Follow Conventional Commits: `type(scope): summary` or `type: summary`.
-- Infer `type` from the actual changes:
-  - `feat` for user-visible feature work.
-  - `fix` for bug fixes.
-  - `docs` for documentation-only changes.
-  - `test` for test-only changes.
-  - `refactor` for behavior-preserving code changes.
-  - `chore` for maintenance/config/tooling.
-- Keep the summary imperative, concise, and lower-case unless a proper noun is required.
-
-Description must include:
-
-- Summary of what changed.
-- Details grouped by area or file when useful.
-- Behavior impact.
-- Verification performed, including tests, builds, docs validation, or why none was run.
-- Risks or rollout notes when relevant.
-- Linked work items when present or supplied in `$ARGUMENTS`.
+Title and description: follow the Pull Request Rules in the `git` skill.
 
 Use the Azure DevOps pull request tool with behavior values resolved from `$ARGUMENTS`.
 
